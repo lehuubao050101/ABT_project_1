@@ -3,11 +3,11 @@
 <pre>
 <h1>µVision Build Log</h1>
 <h2>Project:</h2>
-C:\ABT-2\ABT_project1\tonghop\MDK-ARM\tonghop.uvprojx
-Project File Date:  04/09/2024
+C:\ABT-2\ABT_project1\New folder\ABT_project_1\tonghop2\MDK-ARM\tonghop.uvprojx
+Project File Date:  04/10/2024
 
 <h2>Output:</h2>
-Build target 'tonghop'
+Rebuild target 'tonghop'
 assembling startup_stm32f103xb.s...
 compiling flash.c...
 compiling i2c-lcd.c...
@@ -32,9 +32,9 @@ compiling main.c...
         data ;
 ../Core/Src/main.c(480): warning:  #223-D: function "lcd_clear" declared implicitly
         lcd_clear(); 
-../Core/Src/main.c(661): warning:  #223-D: function "Flash_Write_Uint" declared implicitly
+../Core/Src/main.c(663): warning:  #223-D: function "Flash_Write_Uint" declared implicitly
                         Flash_Write_Uint(data_flash, flash_length);
-../Core/Src/main.c(667): warning:  #223-D: function "Flash_Write_Array_16bit" declared implicitly
+../Core/Src/main.c(669): warning:  #223-D: function "Flash_Write_Array_16bit" declared implicitly
                         Flash_Write_Array_16bit(&flash_write_N[0],ris_temp, data_flash);
 ../Core/Src/main.c(431): warning:  #177-D: variable "a" was declared but never referenced
         uint8_t a=0, i=0,b=0;           
@@ -48,67 +48,67 @@ compiling main.c...
         bool check_N = false, check_T = false;
 ../Core/Src/main.c(498): warning:  #177-D: variable "check_T" was declared but never referenced
         bool check_N = false, check_T = false;
-../Core/Src/main.c(710): warning:  #223-D: function "Flash_Read_Uint" declared implicitly
+../Core/Src/main.c(712): warning:  #223-D: function "Flash_Read_Uint" declared implicitly
                         uint16_t num_arr_read = Flash_Read_Uint(        flash_length );
-../Core/Src/main.c(711): warning:  #223-D: function "lcd_clear" declared implicitly
+../Core/Src/main.c(713): warning:  #223-D: function "lcd_clear" declared implicitly
                         lcd_clear();
-../Core/Src/main.c(714): warning:  #223-D: function "lcd_send_string" declared implicitly
+../Core/Src/main.c(716): warning:  #223-D: function "lcd_send_string" declared implicitly
                         lcd_send_string (buf);
-../Core/Src/main.c(723): warning:  #223-D: function "Flash_Read_Array_16bit" declared implicitly
+../Core/Src/main.c(725): warning:  #223-D: function "Flash_Read_Array_16bit" declared implicitly
                         Flash_Read_Array_16bit(arr_flash_temp ,ris_temp, num_arr_read);
-../Core/Src/main.c(746): warning:  #223-D: function "lcd_put_cur" declared implicitly
+../Core/Src/main.c(748): warning:  #223-D: function "lcd_put_cur" declared implicitly
                         lcd_put_cur(0,0);
-../Core/Src/main.c(754): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(756): warning:  #188-D: enumerated type mixed with another type
                                                         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, 1);
-../Core/Src/main.c(755): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(757): warning:  #188-D: enumerated type mixed with another type
                                                         HAL_GPIO_WritePin(GPIOA , GPIO_PIN_5,1);                        
-../Core/Src/main.c(782): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(784): warning:  #188-D: enumerated type mixed with another type
                                                         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, 0);
-../Core/Src/main.c(783): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(785): warning:  #188-D: enumerated type mixed with another type
                                                         HAL_GPIO_WritePin(GPIOB , GPIO_PIN_1,0);
-../Core/Src/main.c(800): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(802): warning:  #188-D: enumerated type mixed with another type
                                                                 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, 1);
-../Core/Src/main.c(801): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(803): warning:  #188-D: enumerated type mixed with another type
                                                                 HAL_GPIO_WritePin(GPIOB , GPIO_PIN_1,0);
-../Core/Src/main.c(807): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(809): warning:  #188-D: enumerated type mixed with another type
                                                                 HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, 0);
-../Core/Src/main.c(808): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(810): warning:  #188-D: enumerated type mixed with another type
                                                                 HAL_GPIO_WritePin(GPIOB , GPIO_PIN_1,1);
-../Core/Src/main.c(830): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(832): warning:  #188-D: enumerated type mixed with another type
                                                         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, 0);
-../Core/Src/main.c(831): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(833): warning:  #188-D: enumerated type mixed with another type
                                                         HAL_GPIO_WritePin(GPIOB , GPIO_PIN_1,0);
-../Core/Src/main.c(860): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(862): warning:  #188-D: enumerated type mixed with another type
                                         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, 1);
-../Core/Src/main.c(861): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(863): warning:  #188-D: enumerated type mixed with another type
                                         HAL_GPIO_WritePin(GPIOB , GPIO_PIN_1,0);
-../Core/Src/main.c(869): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(871): warning:  #188-D: enumerated type mixed with another type
                                         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, 0);
-../Core/Src/main.c(870): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(872): warning:  #188-D: enumerated type mixed with another type
                                         HAL_GPIO_WritePin(GPIOB , GPIO_PIN_1,1);
-../Core/Src/main.c(750): warning:  #177-D: variable "t" was declared but never referenced
+../Core/Src/main.c(752): warning:  #177-D: variable "t" was declared but never referenced
                                                         uint16_t check_temp =1,t=80,c=80;
-../Core/Src/main.c(750): warning:  #177-D: variable "c" was declared but never referenced
+../Core/Src/main.c(752): warning:  #177-D: variable "c" was declared but never referenced
                                                         uint16_t check_temp =1,t=80,c=80;
-../Core/Src/main.c(752): warning:  #177-D: variable "flash_start" was declared but never referenced
+../Core/Src/main.c(754): warning:  #177-D: variable "flash_start" was declared but never referenced
                                                         uint8_t flash_start =0;
-../Core/Src/main.c(1020): warning:  #223-D: function "lcd_init" declared implicitly
+../Core/Src/main.c(1022): warning:  #223-D: function "lcd_init" declared implicitly
   lcd_init ();
-../Core/Src/main.c(1033): warning:  #223-D: function "lcd_send_string" declared implicitly
+../Core/Src/main.c(1035): warning:  #223-D: function "lcd_send_string" declared implicitly
                         lcd_send_string ("0");
-../Core/Src/main.c(1040): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(1042): warning:  #188-D: enumerated type mixed with another type
                                                         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, 0);
-../Core/Src/main.c(1041): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(1043): warning:  #188-D: enumerated type mixed with another type
                                                         HAL_GPIO_WritePin(GPIOB , GPIO_PIN_1,0);
-../Core/Src/main.c(1048): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(1050): warning:  #188-D: enumerated type mixed with another type
                                                         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, 0);
-../Core/Src/main.c(1049): warning:  #188-D: enumerated type mixed with another type
+../Core/Src/main.c(1051): warning:  #188-D: enumerated type mixed with another type
                                                         HAL_GPIO_WritePin(GPIOA , GPIO_PIN_5,0);
-../Core/Src/main.c(1064): warning:  #223-D: function "lcd_put_cur" declared implicitly
+../Core/Src/main.c(1066): warning:  #223-D: function "lcd_put_cur" declared implicitly
                         lcd_put_cur(0,0);
-../Core/Src/main.c(1085): warning:  #223-D: function "lcd_clear" declared implicitly
+../Core/Src/main.c(1087): warning:  #223-D: function "lcd_clear" declared implicitly
                                         lcd_clear ();
-../Core/Src/main.c(1089): warning:  #223-D: function "lcd_clear" declared implicitly
+../Core/Src/main.c(1091): warning:  #223-D: function "lcd_clear" declared implicitly
                                                 lcd_clear ();
 ../Core/Src/main.c(127): warning:  #177-D: function "MX_DMA_Init" was declared but never referenced
   static void MX_DMA_Init(void);
@@ -134,7 +134,7 @@ compiling stm32f1xx_hal_tim.c...
 compiling stm32f1xx_hal_tim_ex.c...
 compiling system_stm32f1xx.c...
 linking...
-Program Size: Code=17692 RO-data=324 RW-data=56 ZI-data=1984  
+Program Size: Code=17712 RO-data=324 RW-data=56 ZI-data=1984  
 FromELF: creating hex file...
 "tonghop\tonghop.axf" - 0 Error(s), 50 Warning(s).
 
@@ -147,7 +147,7 @@ Package Vendor: ARM
    * Component: CORE Version: 3.30.0
 
 <h2>Collection of Component include folders:</h2>
-  C:\ABT-2\ABT_project1\tonghop\MDK-ARM\RTE
+  C:\ABT-2\ABT_project1\New folder\ABT_project_1\tonghop2\MDK-ARM\RTE
   C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.0\CMSIS\Include
 
 <h2>Collection of Component Files used:</h2>
