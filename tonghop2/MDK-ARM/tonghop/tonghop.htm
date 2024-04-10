@@ -3,7 +3,7 @@
 <title>Static Call Graph - [tonghop\tonghop.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image tonghop\tonghop.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5040049: Last Updated: Wed Apr 10 11:04:20 2024
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5040049: Last Updated: Wed Apr 10 12:02:24 2024
 <BR><P>
 <H3>Maximum Stack Usage =        224 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1203,8 +1203,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[35]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[bb]"></a>num_write_flash</STRONG> (Thumb, 1256 bytes, Stack size 80 bytes, main.o(i.num_write_flash))
-<BR><BR>[Stack]<UL><LI>Max Depth = 200<LI>Call Chain = num_write_flash &rArr; lcd_send_string &rArr; lcd_send_data &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
+<P><STRONG><a name="[bb]"></a>num_write_flash</STRONG> (Thumb, 1274 bytes, Stack size 56 bytes, main.o(i.num_write_flash))
+<BR><BR>[Stack]<UL><LI>Max Depth = 176<LI>Call Chain = num_write_flash &rArr; lcd_send_string &rArr; lcd_send_data &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delay
 <LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;bufcl
