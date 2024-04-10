@@ -1,0 +1,800 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * <h2><center>&copy; Copyright (c) 2024 STMicroelectronics.
+  * All rights reserved.</center></h2>
+  *
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+
+
+static volatile uint16_t stop=0,_key_ =0,_write=0,key_x =0, key_c =0,start=0,check =0;
+static volatile uint8_t _num =0;
+#define ROW1_PIN GPIO_PIN_8
+#define ROW2_PIN GPIO_PIN_9
+#define ROW3_PIN GPIO_PIN_10
+#define ROW4_PIN GPIO_PIN_11
+#define COL1_PIN GPIO_PIN_12
+#define COL2_PIN GPIO_PIN_13
+#define COL3_PIN GPIO_PIN_14
+#define COL4_PIN GPIO_PIN_15
+// Hàm kh?i t?o GPIO cho keypad
+typedef struct {
+ volatile   uint8_t id;
+volatile    uint16_t length1;
+volatile	uint16_t length2;
+volatile	uint8_t nhiet_do_pa3;
+volatile uint8_t state_read;
+volatile	uint8_t stop;
+volatile	uint8_t start;
+
+
+	 volatile uint16_t num_b;
+
+} Mystruct;
+
+
+ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
+
+TIM_HandleTypeDef htim2;
+
+void Keypad_GPIO_Init(void)
+{
+    
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+    // B?t clock cho c?ng GPIOA
+    
+
+    // C?u hình chân GPIO cho hàng là d?u ra
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pin = ROW1_PIN | ROW2_PIN | ROW3_PIN | ROW4_PIN;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+		
+    // C?u hình chân GPIO cho c?t là d?u vào v?i di?n tr? kéo lên
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pin = COL1_PIN | COL2_PIN | COL3_PIN| COL4_PIN;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+}
+
+volatile uint16_t a_key_num =0, c_key_num =0,d[10],num_b=0;
+
+void reset_key(){
+
+							d[0]=0;
+							num_b =0;
+							a_key_num =0;
+	  Lcd_clear_display(); 	
+}
+uint16_t key_final(){
+
+return _key_;
+}
+void Keypad_Read(void)
+{
+    // M?ng luu tr? các giá tr? c?a hàng và c?t
+    
+int8_t keypad[4][4] = {
+    7, 8, 9, 10,
+    4, 5, 6, 11,
+    1, 2, 3, 12,
+		13,0, 14,15,
+};
+    // M?ng luu tr? các chân GPIO c?a hàng
+    uint16_t row_pins[4] = {ROW1_PIN, ROW2_PIN, ROW3_PIN, ROW4_PIN};
+
+    // Quét t?ng hàng
+		 HAL_GPIO_WritePin(GPIOA, ROW1_PIN| ROW2_PIN| ROW3_PIN| ROW4_PIN, GPIO_PIN_RESET);
+    for (uint8_t row = 0; row < 4; row++)
+    {
+        // Ð?t giá tr? c?a hàng thành logic low
+        HAL_GPIO_WritePin(GPIOA, row_pins[row], GPIO_PIN_SET);
+			//	GPIO_PinState pin_state = GPIO_PIN_SET;
+			//	HAL_GPIO_WritePin(GPIOA, ROW1_PIN | ROW2_PIN | ROW3_PIN | ROW4_PIN, pin_state);
+        // Ki?m tra giá tr? c?a c?t
+			uint8_t check_roe = row;
+			uint16_t col_pins[4] = {COL1_PIN, COL2_PIN, COL3_PIN, COL4_PIN};
+        for (uint8_t col = 0; col < 4; col++)
+        {
+            if (HAL_GPIO_ReadPin(GPIOA, col_pins[col]) == GPIO_PIN_SET)
+            {
+							Mystruct m;
+              
+						//	Lcd_write_int(col);
+					
+						if(keypad[row][col] <10){
+							d[0]=0;
+							d[a_key_num+1] =10*d[a_key_num] +keypad[row][col];			
+				num_b = d[a_key_num+1];
+							a_key_num++;
+							
+				
+						}else if(col == 3 && row ==0){					
+							_write =1;
+												
+						}else if(col == 3 && row ==1){
+							key_x =1;
+						
+						}else if(col == 3 && row ==2){
+						key_c =1;
+						}
+						
+						else if(col == 0&& row ==3){
+					
+							//
+							d[0]=0;
+							num_b  =0;
+							a_key_num =0;
+						Lcd_gotoxy( 0,1);
+							Lcd_write_string("        ");
+							
+						 }
+					Lcd_gotoxy( 0,1);
+					
+				Lcd_write_int(num_b);
+						 _key_ = num_b;
+                
+							HAL_Delay(300);
+						}
+        }
+
+        // Ð?t l?i giá tr? c?a hàng thành logic high
+        HAL_GPIO_WritePin(GPIOA, row_pins[row], GPIO_PIN_RESET);
+    }
+	//	Lcd_write_int(keypad[0][0]);
+    // Không có phím nào du?c nh?n
+
+}
+
+void delay_1ms(void)
+{
+ __HAL_TIM_SetCounter(&htim2, 0);
+ while (__HAL_TIM_GetCounter(&htim2)<20);
+}
+void delay_ms(int time)
+{
+ int i = 0;
+ for(i = 0; i < time; i++)
+ {
+   delay_1ms();
+ }
+}
+
+uint8_t key_push(){
+//if((HAL_GPIO_ReadPin(COL1_PIN,GPIOA)==1)|(HAL_GPIO_ReadPin(COL2_PIN,GPIOA)==1)|(HAL_GPIO_ReadPin(COL3_PIN,GPIOA)==1)|(HAL_GPIO_ReadPin(COL4_PIN,GPIOA)==1)){
+
+if((HAL_GPIO_ReadPin(GPIOA, COL1_PIN) == 1) || (HAL_GPIO_ReadPin(GPIOA, COL2_PIN) == 1) || (HAL_GPIO_ReadPin(GPIOA, COL3_PIN) == 1) || (HAL_GPIO_ReadPin(GPIOA, COL4_PIN) == 1)){
+return 1;
+	
+}else{
+return 0;
+	}
+}
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int32_t map(int32_t value, int32_t inputMin, int32_t inputMax, int32_t outputMin, int32_t outputMax)
+{
+    return (value - inputMin) * (outputMax - outputMin) / (inputMax - inputMin) + outputMin;
+}
+
+uint8_t num_adc(){
+	
+ Lcd_gotoxy( 6, 0); 
+		 HAL_ADC_Start(&hadc1);
+HAL_ADC_PollForConversion(&hadc1,100);
+ uint16_t dat = HAL_ADC_GetValue(&hadc1);
+	
+    HAL_Delay(50); ///-------------------------------------------------------
+	char ch[4];
+	uint8_t adc = map(dat,0,4095,0,100);
+	sprintf(ch,"T:%d",adc );
+		 Lcd_write_string(ch);	
+HAL_ADC_Stop(&hadc1);
+	return adc;
+}
+
+
+
+
+
+uint16_t num_key_timer(){
+ int16_t _key = key_final();
+		
+	if( (key_push()== 1)&& _key != 999999){
+				 Lcd_gotoxy( 6,1);
+					Lcd_write_string("    ");
+		Lcd_gotoxy( 3,1);
+				char ch[8];
+				uint8_t a,b;
+
+				if(_key<60){
+				a=0;
+					b = _key;
+				}else{
+				b	= _key%60;
+					a = (_key-b)/60;
+				}
+				sprintf(ch,"%dp:%ds",a,b);
+	
+			Lcd_write_string(ch);	
+	
+	}
+
+ }
+
+ 
+ 
+ 
+ 
+void num_write_flash(){  // write flash--------------------
+	// chinh nhiet do
+	
+	//Flash_Write_Array_16bit(uint16_t* _Array_DATA_, uint32_t _ADDRESS_DATA_, uint16_t _LENGTH_);
+	uint8_t a=0, i=0,b=0;
+uint16_t data ;
+	uint8_t length1,length2 ;
+	Mystruct m;
+	
+	
+	
+	Lcd_gotoxy( 0,0);
+		Lcd_write_string("chuky T/N");
+	
+
+	while(1){
+		
+	
+		Keypad_Read();
+		data 	= key_final();
+	
+				Lcd_gotoxy( 4,1);
+		Lcd_write_int(data);
+		if(	_write ==1){
+		_write=0;
+			break;
+		}
+
+	}
+		uint16_t flash_write_T[data];
+	uint16_t flash_write_N[data];
+	reset_key();
+	
+	Lcd_clear_display(); 
+		Lcd_gotoxy( 0,0);
+	Lcd_write_string("da chon:");
+	Lcd_write_int(data);
+	HAL_Delay(500);
+	reset_key();
+	
+uint8_t num_nhiet=0,num_time =0;
+	Lcd_write_string("0-T");
+	while(1){
+	
+	
+Keypad_Read();
+	uint16_t da 	= key_final();
+	
+				Lcd_gotoxy( 4,1);
+		Lcd_write_int(da);
+	
+
+	if( key_x == 1){  //  nhan vao dau nhan*
+		
+	 length1 = num_nhiet ++;
+		flash_write_N[length1] =  da;
+		char ch1[5];
+		Lcd_gotoxy( 0,0);
+			sprintf(ch1,"%d-N%d ",length1,flash_write_N[length1]);
+		
+			Lcd_write_string(ch1);
+		
+		key_x =0;
+	}else if(key_c ==1){//  nhan vao daau +
+			
+		 length2 = num_time ++;
+		flash_write_T[length2] =  da;
+		char ch2[5];
+			Lcd_gotoxy( 6,0);
+		sprintf(ch2,"%d-T%d",length2,	flash_write_T[length2]);
+			Lcd_write_string(ch2);
+		
+		key_c =0;
+	}
+
+	
+	if(check ==2){
+	
+		
+	/*#define _PAGE_127_ 		 	((uint32_t)0x0801FC02)
+#define _PAGE_126_ 		 	((uint32_t)0x0801F802)
+#define _PAGE_125_ 		 	((uint32_t)0x0801F402)
+#define _PAGE_124_ 		 	((uint32_t)0x0801F002)
+#define _PAGE_123_ 		 	((uint32_t)0x0801EC02)
+#define _PAGE_122_ 		 	((uint32_t)0x0801E802)
+#define _PAGE_121_ 		 	((uint32_t)0x0801E402)
+#define _PAGE_120_ 		 	((uint32_t)0x0801E002)
+#define _PAGE_119_ 		 	((uint32_t)0x0801DC02)
+#define _PAGE_118_ 		 	((uint32_t)0x0801D802) */
+		
+		//	Flash_Write_Array_16bit(flash_write_T[length1],_PAGE_118_, length1);
+	//		Flash_Write_Array_16bit(flash_write_N[length2], _PAGE_119_ , length2);
+		
+		m.length1 = length1;
+		m.length2 = length2;
+		//delay_ms(100);
+		HAL_Delay(100);
+		_write =0;
+	 Lcd_clear_display(); 
+		Lcd_write_string("da luu");
+	
+	check =2;
+	return;
+	
+}
+}
+		//Flash_Write_Uint(data, 1)
+}
+
+
+
+
+
+
+void num_read_fl(){
+
+//	num_key_timer()
+	
+	Mystruct my;
+	
+uint16_t arr1[my.length1] ;
+	uint16_t arr2[my.length2] ;
+	
+	
+//Flash_Read_Array_16bit(arr1, _PAGE_118_, my.length1);
+//Flash_Read_Array_16bit(arr2, _PAGE_119_, my.length2);
+//	Flash_Write_Uint(uint16_t _DATA_, i)
+	 Lcd_clear_display(); 
+	Lcd_write_string("da doc du lieu");
+	HAL_Delay(400);
+	 Lcd_clear_display(); 
+	while(1){
+	uint8_t TEC = num_adc();
+		
+	
+	for(uint8_t i=0; i<10; i++){
+	
+	my.nhiet_do_pa3 =	arr1[i];
+	HAL_Delay(arr2[i]);
+		my.state_read = i;
+	//	delay_ms(arr2[i]);
+	}
+	Lcd_gotoxy( 0,1);
+Lcd_write_int(my.nhiet_do_pa3);
+	if(TEC<my.nhiet_do_pa3){
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0,1);
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1,1);
+
+
+	}
+	if(stop ==1){
+	//Flash_Write_Uint(my.state_read,_PAGE_127_)
+		
+	return;
+	}
+	}
+
+}
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+
+
+
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
+static void MX_ADC1_Init(void);
+static void MX_TIM2_Init(void);
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+	
+	
+	void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) // interrup
+{ 
+  /* Prevent unused argument(s) compilation warning */
+	
+
+  UNUSED(GPIO_Pin);
+  Mystruct m;
+  if(GPIO_Pin==GPIO_PIN_0){
+		  start = !start;
+	
+  }
+	if(GPIO_Pin==GPIO_PIN_1){
+      check ++; 
+	if( check>3){ check =0;};
+  }
+	
+	if(GPIO_Pin==GPIO_PIN_2){
+	start =0;
+	stop = !stop;
+	
+  }
+}
+int main(void)
+{
+  /* USER CODE BEGIN 1 */
+
+  /* USER CODE END 1 */
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
+  SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_DMA_Init();
+  MX_ADC1_Init();
+  MX_TIM2_Init();
+	Keypad_GPIO_Init();
+  /* USER CODE BEGIN 2 */
+Lcd_Init();
+  /* USER CODE END 2 */
+HAL_TIM_Base_Start(&htim2);
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+	//	HAL_ADC_Start_IT( &hadc1);
+	/*
+	int arr[] = {1, 2, 3, 4, 5};
+    int length = sizeof(arr) / sizeof(arr[0]);
+	Lcd_write_string("as:");
+	 Lcd_write_int(arr[4]);*/
+  while (1)
+  {
+		
+//		int16_t ke = Keypad_Read();
+	// Lcd_gotoxy( 0,0);
+//		Lcd_write_int( ke);
+		
+		Mystruct m;
+		 num_adc(); 			// display T/N/key
+			
+		if(check ==1){
+			Lcd_clear_display(); 
+			
+		 num_write_flash();	
+				check =2;			
+		}else if(check ==2){
+			Lcd_gotoxy( 0,0);
+			Lcd_write_string("pin_0-start|1:2");
+			Lcd_gotoxy( 0,1);
+			Lcd_write_int(start);
+			Lcd_write_string(":");
+			Lcd_write_int(check);
+			
+			if(start ==1&& check == 2){
+				Lcd_write_string("bat dau chay");
+				 Lcd_clear_display(); 
+				num_read_fl();
+				
+				}
+		
+		}
+		
+				
+	
+		
+		
+		
+	
+	
+		
+			
+		
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+  }
+  /* USER CODE END 3 */
+}
+
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
+  PeriphClkInit.AdcClockSelection = RCC_ADCPCLK2_DIV2;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/**
+  * @brief ADC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC1_Init(void)
+{
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC1_Init 1 */
+
+  /* USER CODE END ADC1_Init 1 */
+
+  /** Common config
+  */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 1;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_3;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC1_Init 2 */
+
+  /* USER CODE END ADC1_Init 2 */
+
+}
+
+/**
+  * @brief TIM2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM2_Init(void)
+{
+
+  /* USER CODE BEGIN TIM2_Init 0 */
+
+  /* USER CODE END TIM2_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM2_Init 1 */
+
+  /* USER CODE END TIM2_Init 1 */
+  htim2.Instance = TIM2;
+  htim2.Init.Prescaler = 3999;
+  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim2.Init.Period = 1999;
+  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM2_Init 2 */
+
+  /* USER CODE END TIM2_Init 2 */
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+
+}
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2, GPIO_PIN_SET);
+
+  /*Configure GPIO pins : PA0 PA1 PA2 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PB0 PB1 PB2 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI2_IRQn);
+
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
+}
+
+/* USER CODE BEGIN 4 */
+
+/* USER CODE END 4 */
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void)
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+
+  /* USER CODE END Error_Handler_Debug */
+}
+
+#ifdef  USE_FULL_ASSERT
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t *file, uint32_t line)
+{
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+}
+#endif /* USE_FULL_ASSERT */
