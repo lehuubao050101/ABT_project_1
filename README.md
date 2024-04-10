@@ -1,3 +1,5 @@
+file keil ....\ABT_project1\tonghop\MDK-ARM\tonghop.uvprojx
+mở file "tonghop.uvprojx"
 
 file nạp code: ...\ABT_project1\tonghop\MDK-ARM\tonghop\tonghop.hex
 file dự phòng chỉnh sửa lầnlần cuối ngày 11h:10/4/2024 :...\ABT_project1\protues
