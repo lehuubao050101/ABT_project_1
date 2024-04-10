@@ -1,9 +1,10 @@
 
 file nạp code: ...\ABT_project1\tonghop\MDK-ARM\tonghop\tonghop.hex
-file dự phòng chỉnh sửa cuối ngày 11h:10/4/2024 :...\ABT_project1\protues
+file dự phòng chỉnh sửa lầnlần cuối ngày 11h:10/4/2024 :...\ABT_project1\protues
 
 chân digital B0,B1 đang đươcj thiết lập trong codee sử dụng do module BTS
-sử dụng PWM thay đổi chân L_pwm và R_pwm trên module BTS
+sử dụng PWM thay đổi chân L_pwm và R_pwm trên module BTS chân A6,A7
+
 chỉnh sửa và thay đổi code ở dòng 800 đến 817 bằng code sau
 ví dụ:
 
