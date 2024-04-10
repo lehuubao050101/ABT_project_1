@@ -427,7 +427,7 @@ float Temp=0;
 
  
 void num_write_flash(){  // GHI SO CHU KY VA NHIET DO
-	
+	wait =0;
 	uint8_t a=0, i=0,b=0;  		
 	//Flash_Write_Array_16bit(uint16_t* _Array_DATA_, uint32_t _ADDRESS_DATA_, uint16_t _LENGTH_);
 	uint16_t data =0,buf_data=0 ;
@@ -511,21 +511,21 @@ lcd_send_string ("chuky");
 
 			delay(2);
 			uint8_t k_2 =(uint8_t)	Keypad_Read();	
-		delay(10);
-		if(k_2 != 0x01 && k_2<58 ){
-			da= buf_da*10 +k_2 -48;
-			buf_da =da;
-			if(time_data_p_s ==0)
-			{
-			bufcl(1,0);
-				sprintf(buf,"K:%d",da);
-		lcd_send_string (buf);
-			}else
-			{
-			bufcl(1,5);
-				sprintf(buf,"%d",da);
-					lcd_send_string (buf);
-			}
+			delay(10);
+			if(k_2 != 0x01 && k_2<58 ){
+					da= buf_da*10 +k_2 -48;
+					buf_da =da;
+					if(time_data_p_s ==0)
+					{
+							bufcl(1,0);
+							sprintf(buf,"K:%d",da);
+							lcd_send_string (buf);
+					}else
+					{
+								bufcl(1,5);
+								sprintf(buf,"%d",da);
+								lcd_send_string (buf);
+					}
 			
 					
 		}else if(k_2 == 69){
@@ -533,12 +533,14 @@ lcd_send_string ("chuky");
 					time_data_p_s =0;
 		}else if(k_2 == 70){// ----------------------------------------------- thoi gian #
 			if(da <100)
-			{
-			bufcl(1,4); lcd_send_string ("P");
-				time_data_p_s = da*60;
-				buf_da=0;		da =0;lcd_put_cur(1,0);	//lcd_send_string ("        ");	
-			}
+				{
+					bufcl(1,4); lcd_send_string ("P");
+					time_data_p_s = da*60;
+					buf_da=0;		da =0;lcd_put_cur(1,0);	//lcd_send_string ("        ");	
+				}
 		//break;
+		}else if(wait ==1){
+		break;
 		}
 //***************************//END -THIET LAP CAC GIA TRI BAN PHIM\\***************************************	
 		
